@@ -1,3 +1,5 @@
+import { aiAnswer, safetyReply } from './assistant.mjs';
+import { createNewsFeed } from './news.mjs';
 import http from 'node:http';
 import { DatabaseSync } from 'node:sqlite';
 import { randomUUID, createHash, timingSafeEqual } from 'node:crypto';
@@ -28,6 +30,8 @@ export function createApp(options={}){
  const db=new DatabaseSync(dbPath);db.exec(`PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;
  CREATE TABLE IF NOT EXISTS requests(id TEXT PRIMARY KEY, request_key TEXT UNIQUE NOT NULL, fingerprint TEXT NOT NULL, data TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'requested', created INTEGER NOT NULL, notified INTEGER NOT NULL DEFAULT 0);
  CREATE TABLE IF NOT EXISTS rate_limits(key TEXT PRIMARY KEY, count INTEGER NOT NULL, expires INTEGER NOT NULL);`);
+ const newsFeed=createNewsFeed(options.newsFetch);
+ const assistantEnabled=Boolean(env.OPENAI_API_KEY&&env.ENABLE_AI_ASSISTANT==='true');
  const origins=(env.ALLOWED_ORIGINS||'').split(',').map(v=>v.trim()).filter(Boolean);
  const enabled=Boolean(env.ADMIN_API_TOKEN?.length>=32&&env.RESEND_API_KEY&&env.MAIL_FROM&&env.CLINIC_EMAIL&&origins.length);
  const notify=options.notify||async function(record){
@@ -52,7 +56,18 @@ export function createApp(options={}){
   const path=new URL(req.url,'http://internal').pathname;
   try{
    if(req.method==='GET'&&path==='/health')return send(200,{status:'ok'});
-   if(req.method==='GET'&&path==='/api/public/config')return send(200,{bookingEnabled:enabled});
+   if(req.method==='GET'&&path==='/api/public/config')return send(200,{bookingEnabled:enabled,assistantEnabled});
+   if(req.method==='GET'&&path==='/api/news')return send(200,await newsFeed());
+   if(req.method==='POST'&&path==='/api/assistant'){
+    if(!assistantEnabled)return send(503,{error:'AI assistant unavailable. Use the clinic guide.'});
+    if(!origin||!origins.includes(origin))return send(403,{error:'Website origin required.'});
+    if(!(req.headers['content-type']||'').startsWith('application/json'))return send(415,{error:'JSON required.'});
+    const body=await readBody(req);
+    if(body.consent!==true||typeof body.question!=='string'||!body.question.trim()||body.question.length>800||typeof body.sessionId!=='string'||!/^[a-f\d-]{36}$/i.test(body.sessionId))return send(400,{error:'A short question, session identifier and consent are required.'});
+    if(limited('ai:session:'+hash(body.sessionId),15)||limited('ai:global',100))return send(429,{error:'Assistant request limit reached. Please call the clinic.'});
+    const safety=safetyReply(body.question);if(safety)return send(200,{answer:safety,mode:'guide'});
+    try{return send(200,{answer:await aiAnswer(body.question,env,options.aiFetch),mode:'ai'});}catch{return send(503,{error:'AI assistant unavailable. Use the clinic guide or telephone the clinic.'});}
+   }
    // Do not trust arbitrary forwarded client addresses. Phone limits are persisted as hashes.
    if(path.startsWith('/api/admin/')){
     if(!env.ADMIN_API_TOKEN||env.ADMIN_API_TOKEN.length<32||!equal(req.headers.authorization||'',`Bearer ${env.ADMIN_API_TOKEN}`))return send(401,{error:'Unauthorised.'});

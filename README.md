@@ -65,3 +65,27 @@ Run `node --test backend/server.test.mjs` with Node 24. Tests cover validation, 
 ## Existing project findings (20 October 2026)
 
 Connected GitHub repositories include `tlcoke2/tec_epr_frontend` and `tlcoke2/tec_epr_backend`. The `TLC-Associated-Healthcare` main tree contained only `.gitattributes` when inspected. The connected Sites list contained the Centry project but no Healthy Concept site before this build. Web and file searches did not identify an existing live Healthy Concept website. This does not prove one has never existed in another account or environment.
+
+## Health hub, blog, directory and AI assistant (21 October 2026)
+
+New public pages: `health.html`, `blog.html`, `news.html`, `local-services.html` and three individually shareable article pages. The content contains general information with source links; it does not claim clinical review or Ministry endorsement. User-confirmed clinic hours, fee and main telephone are retained. The owner confirmed successful appointment-reference/email receipt and configured backups/database verification in this conversation.
+
+### Edit and publish articles
+
+Edit `content/articles.json` in GitHub. Each article requires a unique lowercase hyphenated `slug`, title, category, ISO date, summary, paragraphs and a source title/HTTPS URL. The Pages workflow runs `python3 scripts/build_content.py` to regenerate article pages, blog index, RSS and sitemap. Commit changes to main to publish. Review health claims and sources before publication; do not add patient details or identifiable case histories. Existing templates use the initial publication date in display copy; update the generator's displayed dates when publishing later content. This is a GitHub-managed static blog, not a staff CMS.
+
+### Activate AI answers
+
+The on-site Clinic guide works without an AI key and explicitly identifies its responses as published information. To enable optional AI replies, add `OPENAI_API_KEY` to Railway, set `ENABLE_AI_ASSISTANT=true` and set `OPENAI_MODEL=gpt-4.1-mini` (or an available compatible Responses API model). Redeploy. Set provider account spending limits. Never put the key in GitHub, config.js or chat. The UI only displays the AI opt-in when the backend reports it configured; each AI question requires consent. Questions go to OpenAI with `store:false`, but provider data handling policies still apply. No transcripts are stored in the clinic database. This is a clinic navigation/service assistant, not a symptom checker or medical adviser. It does not access appointments or TEC records. Clinical/emergency keyword routing and instructions reduce risk but are not a clinically validated triage system. Provider credentials and real AI responses require live verification after setup.
+
+Endpoint: `POST /api/assistant`, JSON `{question, consent:true, sessionId:<UUID>}` from an allowed website origin. Limits: 800 input characters, 350 maximum output tokens, 15 calls per session per hour and 100 globally per hour, persisted in existing rate-limit storage. Session identifiers can be rotated by visitors; global ceilings and provider spending controls bound exposure. Do not interpret these limits as comprehensive bot protection.
+
+### News feed
+
+`GET /api/news` fetches the fixed official Ministry RSS URL, caches successful results for 30 minutes and returns up to eight dated headline links. It does not republish articles. If unavailable, it returns selected dated official links with `live:false`, and the UI clearly labels them. The Ministry endpoint rejected access from the build environment; runtime access may differ. No scheduler is required: requests refresh the cache on demand. The clinic's blog RSS is available at `feed.xml`.
+
+### Social traffic
+
+Each new page includes WhatsApp, Facebook and LinkedIn share links, copy-link and copy-social-post buttons. Sharing is initiated by the visitor; nothing is posted automatically. Social preview metadata, canonical URLs, sitemap and source-labelled content support discoverability, without promising search rankings or traffic. Add verified clinic profile URLs to `window.HCMC_SOCIAL_PROFILES` in `dist/config.js` to display Follow links. No profile URL or account was supplied, so no social profile was invented or modified. On each owned profile, add `https://tlcoke2.github.io/healthy-concept-medical-centre/` as the website/bio link; use the blog and news URLs in relevant posts. Social profile edits require account access.
+
+The clinic email recipient remains controlled by Railway `CLINIC_EMAIL`; the owner changed it to tlcoke@hotmail.com. AI setup does not alter booking or mail variables.

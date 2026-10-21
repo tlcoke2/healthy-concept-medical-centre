@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://tlcoke2.github.io/healthy-concept-medical-centre/sitemap.xml
