@@ -8,7 +8,7 @@ Patient-facing website for 58 Barnett Street, Montego Bay, St. James, Jamaica.
 - `backend/`: Node 24 API, Dockerfile, Railway configuration, tests and environment example.
 - `.github/workflows/pages.yml`: GitHub Pages deployment workflow.
 - A private Sites review deployment is separate from the requested production hosting.
-- The source is uploaded to `tlcoke2/healthy-concept-medical-centre`. GitHub Pages activation and Railway deployment remain pending. The user supplied TEC login URL is `https://portal.thuemancokelimited.com/login`, and the staff entrance is connected to it. No booking is claimed when the API is unavailable.
+- The source is uploaded to `tlcoke2/healthy-concept-medical-centre`. GitHub Pages is live at https://tlcoke2.github.io/healthy-concept-medical-centre/ and the Railway API health check succeeds at https://healthy-concept-medical-centre-production.up.railway.app/health. Frontend API wiring is configured. At the last check, booking was disabled and the GitHub Pages origin was rejected; Railway environment configuration and notification verification remain outstanding. The user supplied TEC login URL is `https://portal.thuemancokelimited.com/login`, and the staff entrance is connected to it. No booking is claimed when the API is unavailable.
 - No patient records are stored on GitHub Pages. This is appointment intake, not an EPR replacement or a patient records portal. Clinical workflows remain in the existing TEC application.
 
 ## Publish the frontend without buying a domain
