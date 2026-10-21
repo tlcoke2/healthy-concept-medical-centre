@@ -8,7 +8,7 @@ Patient-facing website for 58 Barnett Street, Montego Bay, St. James, Jamaica.
 - `backend/`: Node 24 API, Dockerfile, Railway configuration, tests and environment example.
 - `.github/workflows/pages.yml`: GitHub Pages deployment workflow.
 - A private Sites review deployment is separate from the requested production hosting.
-- The source is uploaded to `tlcoke2/healthy-concept-medical-centre`. GitHub Pages is live at https://tlcoke2.github.io/healthy-concept-medical-centre/ and the Railway API health check succeeds at https://healthy-concept-medical-centre-production.up.railway.app/health. Frontend API wiring is configured. At the last check, booking was disabled and the GitHub Pages origin was rejected; Railway environment configuration and notification verification remain outstanding. The user supplied TEC login URL is `https://portal.thuemancokelimited.com/login`, and the staff entrance is connected to it. No booking is claimed when the API is unavailable.
+- The source is uploaded to `tlcoke2/healthy-concept-medical-centre`. GitHub Pages is live at https://tlcoke2.github.io/healthy-concept-medical-centre/ and the Railway API health check succeeds at https://healthy-concept-medical-centre-production.up.railway.app/health. Frontend API wiring is configured. Booking is enabled, and the owner confirmed receipt of a reference and notification email. As of 21 October 2026, the new AI/news backend deployment is still pending during Railway build disruption. The user supplied TEC login URL is `https://portal.thuemancokelimited.com/login`, and the staff entrance is connected to it. No booking is claimed when the API is unavailable.
 - No patient records are stored on GitHub Pages. This is appointment intake, not an EPR replacement or a patient records portal. Clinical workflows remain in the existing TEC application.
 
 ## Publish the frontend without buying a domain
@@ -16,7 +16,7 @@ Patient-facing website for 58 Barnett Street, Montego Bay, St. James, Jamaica.
 1. The repository `tlcoke2/healthy-concept-medical-centre` has been created and populated. The existing TEC EPR repositories and TCL website are unchanged.
 2. The website source, backend and publishing workflow are on `main`. No local transfer or ZIP extraction is required.
 3. Open repository Settings → Pages. Choose GitHub Actions as the source.
-4. Run the included **Publish clinic website** workflow. After success, use the URL returned by GitHub Pages Settings. The usual project address is `https://tlcoke2.github.io/healthy-concept-medical-centre/`; this is a planned address, not a verified live URL. An account-level custom domain may affect the resulting URL.
+4. Run the included **Publish clinic website** workflow. After success, use the URL returned by GitHub Pages Settings. The usual project address is `https://tlcoke2.github.io/healthy-concept-medical-centre/`; this is the verified live address. An account-level custom domain may affect the resulting URL.
 5. Add a custom domain later if desired. All assets use relative paths for project hosting.
 
 ## Deploy the API to Railway
@@ -26,7 +26,7 @@ Patient-facing website for 58 Barnett Street, Montego Bay, St. James, Jamaica.
 3. Set variables from `backend/.env.example`: `DATABASE_PATH`, `ALLOWED_ORIGINS`, `ADMIN_API_TOKEN`, `RESEND_API_KEY`, `MAIL_FROM`, `CLINIC_EMAIL`.
 4. Generate `ADMIN_API_TOKEN` as instructed in the example. Store it in Railway and a password manager only. It is for server-to-server administration, not a patient or staff password, and must never be put in frontend code.
 5. `ALLOWED_ORIGINS` must contain the exact frontend origin, e.g. `https://tlcoke2.github.io`, with no trailing slash or repository path. If the actual Pages URL uses a custom domain, use that origin. Add the private review origin only if intentionally testing it against the API.
-6. Configure a Resend API key and a verified sender address, preferably on an existing domain you control (for example your business domain). You do not need a new clinic domain for the website, but the notification sender must be authorised. The clinic recipient defaults to `hcmcstjames@gmail.com`. The API is deliberately unavailable for intake until the required notification/admin settings exist. Use the provider's actual key and verified sender; placeholder values are not sufficient.
+6. Configure a Resend API key and a verified sender address, preferably on an existing domain you control (for example your business domain). You do not need a new clinic domain for the website, but the notification sender must be authorised. Set the clinic recipient explicitly using `CLINIC_EMAIL`. The API is deliberately unavailable for intake until the required notification/admin settings exist. Use the provider's actual key and verified sender; placeholder values are not sufficient.
 7. Generate a Railway HTTPS domain and check `/health` returns `{"status":"ok"}`. Confirm `/api/public/config` reports `bookingEnabled: true` only after configuration.
 8. Set `apiBase` in `dist/config.js` to the API's actual HTTPS origin. Commit to republish Pages.
 9. Submit one controlled test request, confirm the email arrives, verify it in the admin API, then delete the test request. Verify access from an unapproved origin fails. Check the Railway volume persists after redeployment.
@@ -89,3 +89,8 @@ Endpoint: `POST /api/assistant`, JSON `{question, consent:true, sessionId:<UUID>
 Each new page includes WhatsApp, Facebook and LinkedIn share links, copy-link and copy-social-post buttons. Sharing is initiated by the visitor; nothing is posted automatically. Social preview metadata, canonical URLs, sitemap and source-labelled content support discoverability, without promising search rankings or traffic. Add verified clinic profile URLs to `window.HCMC_SOCIAL_PROFILES` in `dist/config.js` to display Follow links. No profile URL or account was supplied, so no social profile was invented or modified. On each owned profile, add `https://tlcoke2.github.io/healthy-concept-medical-centre/` as the website/bio link; use the blog and news URLs in relevant posts. Social profile edits require account access.
 
 The clinic email recipient remains controlled by Railway `CLINIC_EMAIL`; the owner changed it to tlcoke@hotmail.com. AI setup does not alter booking or mail variables.
+
+
+## Clinic domain and Zoho email — 21 October 2026
+
+The owner registered healthyconceptmedical.com and created thuemancoke@healthyconceptmedical.com with Zoho. Public contact and clinic-guide text now use this address. Mail MX records resolve to Zoho EU; SPF includes Zoho EU. This DNS check does not prove end-to-end mailbox delivery. Website-domain cutover remains pending. See [DOMAIN_SETUP.md](DOMAIN_SETUP.md). Runtime CLINIC_EMAIL was previously tlcoke@hotmail.com; changing website text does not change that Railway variable.
