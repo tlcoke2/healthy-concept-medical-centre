@@ -3,3 +3,4 @@
 
 /* Clinic brand and editorial service imagery */
 .clinic-logo{width:64px;height:64px;object-fit:contain;border-radius:10px;background:white;flex-shrink:0}.consultation-art{display:block;width:100%;height:auto;border-radius:20px;object-fit:cover;margin:20px 0}.art-caption{font-size:.75rem;text-align:center;opacity:.75}.wellbeing-feature{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,5vw,72px);align-items:center;margin-top:64px;margin-bottom:48px}.wellbeing-feature>img{width:100%;height:auto;border-radius:24px}.wellbeing-feature h2{font-size:clamp(2rem,4vw,3rem);line-height:1.15}.wellbeing-feature .text-link{display:block;margin-top:20px}.wellbeing-feature .fine{margin-top:24px}@media(max-width:760px){.wellbeing-feature{grid-template-columns:1fr}.clinic-logo{width:52px;height:52px}}
+.hero>*{min-width:0}.hero-art img{max-width:100%}.wellbeing-feature>*{min-width:0}
