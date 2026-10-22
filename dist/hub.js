@@ -6,7 +6,7 @@
  function searchContent(){let count=0;document.querySelectorAll('.filterable').forEach(card=>{card.hidden=!(card.textContent.toLowerCase().includes(search.value.toLowerCase().trim())&&(!filter.value||card.dataset.category===filter.value));if(!card.hidden)count++;});document.querySelector('#search-status').textContent=count?`${count} result${count===1?'':'s'}`:'No matches. Try another topic or area.';}
  if(search){search.addEventListener('input',searchContent);filter.addEventListener('change',searchContent);searchContent();}
  document.querySelectorAll('[data-share]').forEach(container=>{
-  const canonical=document.querySelector('link[rel=canonical]')?.href||'https://tlcoke2.github.io/healthy-concept-medical-centre/';
+  const canonical=document.querySelector('link[rel=canonical]')?.href||'https://healthyconceptmedical.com/';
   const title=document.title.replace(' | Healthy Concept Medical Centre','');
   function tracked(source){let u=new URL(canonical);u.searchParams.set('utm_source',source);u.searchParams.set('utm_medium','social');return u.href;}
   const links=[['WhatsApp','https://wa.me/?text='+encodeURIComponent(title+' — '+tracked('whatsapp'))],['Facebook','https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(tracked('facebook'))],['LinkedIn','https://www.linkedin.com/sharing/share-offsite/?url='+encodeURIComponent(tracked('linkedin'))]];

@@ -3,7 +3,7 @@ from html import escape as esc
 import json,re
 from xml.sax.saxutils import escape as xml
 R=Path(__file__).resolve().parents[1]; D=R/'dist'
-BASE='https://tlcoke2.github.io/healthy-concept-medical-centre/'
+BASE='https://healthyconceptmedical.com/'
 articles=json.loads((R/'content/articles.json').read_text())
 raw=(D/'index.html').read_text()
 header=raw[raw.index('<header>'):raw.index('</header>')+9]
